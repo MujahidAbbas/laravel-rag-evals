@@ -1,58 +1,80 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Laravel RAG Evals
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A small but real RAG system built with the [Laravel AI SDK](https://laravel.com/docs/13.x/ai-sdk)
+and pgvector, plus the eval suite that tells you whether retrieval is actually any
+good. Companion code for the article *Evaluating RAG in Laravel: Is Your Agent
+Retrieving the Right Chunks?*
 
-## About Laravel
+A support agent answers questions from a 9-document knowledge base (returns,
+shipping, refunds, warranty, account, exchanges, damaged items, promotions,
+privacy). The interesting part is `tests/Evals/` — it measures retrieval quality
+against real OpenAI embeddings and a real pgvector database.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Requirements
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- PHP 8.4+, Composer
+- PostgreSQL with the `pgvector` extension
+- An OpenAI API key with a little credit (the evals hit the real API on purpose)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
-
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Setup
 
 ```bash
-composer require laravel/boost --dev
+composer install
+cp .env.example .env && php artisan key:generate
 
-php artisan boost:install
+# Postgres + pgvector (macOS / Homebrew)
+brew install postgresql@17 pgvector
+brew services start postgresql@17
+createdb laravel_rag_evals
+
+# .env
+#   DB_CONNECTION=pgsql
+#   DB_DATABASE=laravel_rag_evals
+#   DB_USERNAME=<your os user>     # Homebrew Postgres superuser, not "root"
+#   OPENAI_API_KEY=sk-...
+
+php artisan migrate
+php artisan kb:ingest        # chunk -> embed -> store
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+## Run the evals
 
-## Contributing
+```bash
+php artisan test --testsuite=Evals
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+You'll see something like:
 
-## Code of Conduct
+```
+source hit@1: 94% (30/32)
+source hit@3: 100% (32/32)
+answer@1:     84% (27/32)
+Answer faithfulness: 94% pass (30/32)
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Watch the eval catch a regression
 
-## Security Vulnerabilities
+Cut the embedding dimensions — a realistic "shrink the index to save storage" move —
+and watch retrieval quality collapse:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+KB_EMBEDDING_DIMENSIONS=16 php artisan migrate:fresh --force
+KB_EMBEDDING_DIMENSIONS=16 php artisan kb:ingest
+KB_EMBEDDING_DIMENSIONS=16 php artisan test --testsuite=Evals
+# source hit@1 drops to ~63% — the suite goes red and names the failing questions
 
-## License
+# restore
+php artisan migrate:fresh --force && php artisan kb:ingest
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Configuration
+
+`config/knowledge.php` (env-driven):
+
+- `KB_EMBEDDING_MODEL` (default `text-embedding-3-small`)
+- `KB_EMBEDDING_DIMENSIONS` (default `1536`)
+- `KB_RETRIEVAL_K` (default `4`)
+
+> Ingestion and querying read the same config, so the stored vectors and the query
+> vector can never use a different model or dimension. That drift is a classic
+> source of silent garbage retrieval.

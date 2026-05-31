@@ -1,0 +1,42 @@
+[
+  { "question": "How many days do I have to return a product?", "expected_source": "returns-policy.md", "expected_substring": "30 days of delivery" },
+  { "question": "Can I return an item I have already opened?", "expected_source": "returns-policy.md", "expected_substring": "opened and inspected" },
+  { "question": "Is there a fee for returning an item?", "expected_source": "returns-policy.md", "expected_substring": "15% restocking fee" },
+  { "question": "How do I start a return?", "expected_source": "returns-policy.md", "expected_substring": "prepaid shipping label" },
+
+  { "question": "When will my refund show up on my card?", "expected_source": "refunds-billing.md", "expected_substring": "5 to 10 business days" },
+  { "question": "I was charged twice for the same order", "expected_source": "refunds-billing.md", "expected_substring": "temporary authorization hold" },
+  { "question": "How do I update the credit card on my account?", "expected_source": "refunds-billing.md", "expected_substring": "add a new payment method" },
+  { "question": "How do I cancel my subscription?", "expected_source": "refunds-billing.md", "expected_substring": "stops future charges" },
+
+  { "question": "Do you ship to Canada?", "expected_source": "shipping-policy.md", "expected_substring": "Canada, the United Kingdom" },
+  { "question": "How long does standard shipping take?", "expected_source": "shipping-policy.md", "expected_substring": "3 to 5 business days" },
+  { "question": "How much does express shipping cost?", "expected_source": "shipping-policy.md", "expected_substring": "$14.95" },
+  { "question": "My package was marked delivered but I never got it", "expected_source": "shipping-policy.md", "expected_substring": "open a claim with the carrier" },
+  { "question": "Where do I find my tracking number?", "expected_source": "shipping-policy.md", "expected_substring": "tracking link is emailed" },
+
+  { "question": "Is my product still under warranty?", "expected_source": "warranty.md", "expected_substring": "1-year limited warranty" },
+  { "question": "How do I file a warranty claim?", "expected_source": "warranty.md", "expected_substring": "Warranty claim" },
+  { "question": "My battery no longer holds a charge, is that covered?", "expected_source": "warranty.md", "expected_substring": "batteries that no longer hold a charge" },
+  { "question": "Does the warranty cover normal scratches and wear?", "expected_source": "warranty.md", "expected_substring": "normal cosmetic wear" },
+
+  { "question": "How do I reset my password?", "expected_source": "account.md", "expected_substring": "Forgot password" },
+  { "question": "How do I change my email address?", "expected_source": "account.md", "expected_substring": "confirm the change" },
+  { "question": "How do I turn on two-factor authentication?", "expected_source": "account.md", "expected_substring": "two-factor authentication" },
+  { "question": "How do I delete my account?", "expected_source": "account.md", "expected_substring": "30-day grace period" },
+
+  { "question": "Can I swap an item for a larger size?", "expected_source": "exchanges.md", "expected_substring": "Exchanges ship free" },
+  { "question": "What is the difference between a return and an exchange?", "expected_source": "exchanges.md", "expected_substring": "swaps it for a different variant" },
+  { "question": "What happens if the size I want for an exchange is sold out?", "expected_source": "exchanges.md", "expected_substring": "hold the exchange for 14 days" },
+
+  { "question": "My order arrived broken in the box, what do I do?", "expected_source": "damaged-or-defective.md", "expected_substring": "within 48 hours with photos" },
+  { "question": "I received the wrong product", "expected_source": "damaged-or-defective.md", "expected_substring": "shipped the wrong product" },
+  { "question": "Is an item that was faulty out of the box a warranty claim?", "expected_source": "damaged-or-defective.md", "expected_substring": "damaged-on-arrival case" },
+
+  { "question": "If I used a coupon, how much do I get refunded?", "expected_source": "promotions-and-gift-cards.md", "expected_substring": "amount you actually paid" },
+  { "question": "Do gift cards expire?", "expected_source": "promotions-and-gift-cards.md", "expected_substring": "Gift cards never expire" },
+  { "question": "The price dropped right after I bought it, can I get the difference?", "expected_source": "promotions-and-gift-cards.md", "expected_substring": "price adjustment" },
+
+  { "question": "How do I download a copy of my personal data?", "expected_source": "privacy-and-data.md", "expected_substring": "secure download link within 48 hours" },
+  { "question": "How do I stop marketing emails?", "expected_source": "privacy-and-data.md", "expected_substring": "Communication preferences" }
+]

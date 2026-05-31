@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 /*
@@ -17,6 +18,22 @@ use Tests\TestCase;
 pest()->extend(TestCase::class)
  // ->use(RefreshDatabase::class)
     ->in('Feature');
+
+// Evals run against the REAL pgvector database and the live OpenAI API on
+// purpose. The test env in phpunit.xml forces sqlite :memory:, which has
+// neither the pgvector extension nor the ingested chunks, so point the
+// default connection back at the real Postgres database for this suite.
+pest()->extend(TestCase::class)
+    ->beforeEach(function () {
+        config([
+            'database.default' => 'pgsql',
+            'database.connections.pgsql.url' => null,
+            'database.connections.pgsql.database' => 'laravel_rag_evals',
+        ]);
+
+        DB::purge('pgsql');
+    })
+    ->in('Evals');
 
 /*
 |--------------------------------------------------------------------------
