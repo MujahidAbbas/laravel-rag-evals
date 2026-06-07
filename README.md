@@ -2,13 +2,19 @@
 
 A small but real RAG system built with the [Laravel AI SDK](https://laravel.com/docs/13.x/ai-sdk)
 and pgvector, plus the eval suite that tells you whether retrieval is actually any
-good. Companion code for the article *Evaluating RAG in Laravel: Is Your Agent
-Retrieving the Right Chunks?*
+good. Companion code for a two-part series on RAG in Laravel (see [Articles](#articles) below).
 
 A support agent answers questions from a 9-document knowledge base (returns,
 shipping, refunds, warranty, account, exchanges, damaged items, promotions,
 privacy). The interesting part is `tests/Evals/` — it measures retrieval quality
 against real OpenAI embeddings and a real pgvector database.
+
+## Articles
+
+This repo is the demo for a two-part series on RAG in Laravel. Build it, then prove it:
+
+1. [Building RAG in Laravel: Four Ingestion Bugs That Silently Wreck Retrieval](https://mujahidabbas.dev/blog/building-rag-laravel-pgvector/) — the ingestion pipeline that decides retrieval quality before the model runs: chunking, the pgvector index operator, embedding dimensions, and the model lock.
+2. [Evaluating RAG in Laravel: Is Your Agent Retrieving the Right Chunks?](https://mujahidabbas.dev/blog/evaluating-rag-laravel/) — the eval suite in `tests/Evals/` that measures retrieval quality and catches silent regressions.
 
 ## Requirements
 
@@ -61,7 +67,7 @@ and watch retrieval quality collapse:
 KB_EMBEDDING_DIMENSIONS=16 php artisan migrate:fresh --force
 KB_EMBEDDING_DIMENSIONS=16 php artisan kb:ingest
 KB_EMBEDDING_DIMENSIONS=16 php artisan test --testsuite=Evals
-# source hit@1 drops to ~63% — the suite goes red and names the failing questions
+# source hit@1 drops to ~47% — the suite goes red and names the failing questions
 
 # restore
 php artisan migrate:fresh --force && php artisan kb:ingest
