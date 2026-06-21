@@ -1,0 +1,12 @@
+[
+  { "question": "I changed my mind about something I bought, can I send it back for my money?", "expected_source": "returns-policy.md", "expected_substring": "full refund" },
+  { "question": "It's been over a week and my money still isn't back, what gives?", "expected_source": "refunds-billing.md", "expected_substring": "5 to 10 business days" },
+  { "question": "The courier says it's here but my doorstep is empty.", "expected_source": "shipping-policy.md", "expected_substring": "open a claim with the carrier" },
+  { "question": "I'm in Australia, will I get hit with extra charges when it arrives?", "expected_source": "shipping-policy.md", "expected_substring": "Duties and import taxes" },
+  { "question": "My headphones just died on their own after six months, am I covered?", "expected_source": "warranty.md", "expected_substring": "manufacturing defects" },
+  { "question": "These shoes are too small, can I get the next size up without paying again?", "expected_source": "exchanges.md", "expected_substring": "Exchanges ship free" },
+  { "question": "It was busted when I opened the box, is that a warranty thing?", "expected_source": "damaged-or-defective.md", "expected_substring": "damaged-on-arrival case" },
+  { "question": "I scored a deal with a code at checkout, what's my refund if I send it back?", "expected_source": "promotions-and-gift-cards.md", "expected_substring": "amount you actually paid" },
+  { "question": "How do I add an extra login code so nobody else can get into my account?", "expected_source": "account.md", "expected_substring": "two-factor authentication" },
+  { "question": "How do I get you to quit emailing me deals?", "expected_source": "privacy-and-data.md", "expected_substring": "Communication preferences" }
+]
