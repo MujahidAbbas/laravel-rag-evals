@@ -2,7 +2,7 @@
 
 namespace App\Ai\Tools;
 
-use App\Support\KnowledgeBaseRetriever;
+use App\Support\TracedRetriever;
 use Illuminate\Contracts\JsonSchema\JsonSchema;
 use Laravel\Ai\Contracts\Tool;
 use Laravel\Ai\Tools\Request;
@@ -19,7 +19,9 @@ class SearchKnowledgeBase implements Tool
 
     public function handle(Request $request): Stringable|string
     {
-        $chunks = app(KnowledgeBaseRetriever::class)->retrieve($request['query']);
+        // The traced retriever behaves exactly like the plain one, but records a
+        // rag_traces row on the way through so live traffic is never invisible.
+        $chunks = app(TracedRetriever::class)->retrieve($request['query']);
 
         if ($chunks->isEmpty()) {
             return 'No relevant policy information was found.';

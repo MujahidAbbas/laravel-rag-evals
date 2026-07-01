@@ -20,6 +20,19 @@ class KnowledgeBaseRetriever
 
         $vector = $this->embedder->toVector($this->embedder->one($query));
 
+        return $this->search($vector, $k);
+    }
+
+    /**
+     * Search stored chunks by a pgvector literal, nearest first. Split out from
+     * retrieve() so a caller that already holds the query embedding — or one
+     * that wants to time the embed and the search separately — can run just
+     * this stage.
+     *
+     * @return Collection<int, object>
+     */
+    public function search(string $vector, int $k): Collection
+    {
         return collect(DB::select(
             'select id, source, chunk_index, content,
                     1 - (embedding <=> ?::vector) as similarity
