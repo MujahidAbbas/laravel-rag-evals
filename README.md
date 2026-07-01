@@ -2,7 +2,7 @@
 
 A small but real RAG system built with the [Laravel AI SDK](https://laravel.com/docs/13.x/ai-sdk)
 and pgvector, plus the eval suite that tells you whether retrieval is actually any
-good. Companion code for a two-part series on RAG in Laravel (see [Articles](#articles) below).
+good. Companion code for a series on RAG in Laravel (see [Articles](#articles) below).
 
 A support agent answers questions from a 9-document knowledge base (returns,
 shipping, refunds, warranty, account, exchanges, damaged items, promotions,
@@ -11,10 +11,12 @@ against real OpenAI embeddings and a real pgvector database.
 
 ## Articles
 
-This repo is the demo for a two-part series on RAG in Laravel. Build it, then prove it:
+This repo is the demo for a series on RAG in Laravel. Build it, prove it, watch it in production:
 
 1. [Building RAG in Laravel: Four Ingestion Bugs That Silently Wreck Retrieval](https://mujahidabbas.dev/blog/building-rag-laravel-pgvector/) — the ingestion pipeline that decides retrieval quality before the model runs: chunking, the pgvector index operator, embedding dimensions, and the model lock.
 2. [Evaluating RAG in Laravel: Is Your Agent Retrieving the Right Chunks?](https://mujahidabbas.dev/blog/evaluating-rag-laravel/) — the eval suite in `tests/Evals/` that measures retrieval quality and catches silent regressions.
+3. [Reranking RAG in Laravel: The Right Document, the Wrong Paragraph](https://mujahidabbas.dev/blog/rag-reranking-laravel/) — a two-stage reranker (`RerankRetriever` + `ChunkRanker`) that reorders the candidate pool, measured against a deliberately messy golden set.
+4. [Observing RAG in Laravel: Your Retrieval Is Getting Worse and Nothing Throws](https://mujahidabbas.dev/blog/rag-observability-laravel/) — trace retrieval quality, token cost, and faithfulness on live traffic with `TracedRetriever`, a `rag_traces` table, and the `kb:probe` command.
 
 ## Requirements
 
@@ -72,6 +74,23 @@ KB_EMBEDDING_DIMENSIONS=16 php artisan test --testsuite=Evals
 # restore
 php artisan migrate:fresh --force && php artisan kb:ingest
 ```
+
+## Observe retrieval on live traffic
+
+The evals above run offline, against a golden set. Production has no labels.
+`TracedRetriever` records one `rag_traces` row per query: the retrieved chunks with
+their similarity scores and ranks, per-stage latency, and — via the `TraceGeneration`
+agent middleware — the answer, its token cost, and a sampled faithfulness score.
+
+```bash
+php artisan migrate                              # creates rag_traces
+php artisan kb:probe --set=hard-questions.json   # mean top-1 similarity, a label-free health check
+php artisan test --testsuite=Evals               # includes the observability + generation-trace evals
+```
+
+`kb:probe` prints the average top-1 similarity for a question set. Run it after any
+re-ingest and a silent retrieval regression shows up the same day, before a single
+customer complains.
 
 ## Configuration
 
