@@ -29,7 +29,7 @@ return new class extends Migration
             $table->double('embed_ms');
             $table->double('search_ms');
 
-            // Generation-side columns, filled in by the agent middleware once the
+            // Generation-side columns, filled in by the agent listener once the
             // answer comes back. Nullable because the retrieval trace is written
             // first, before the model has run.
             $table->text('answer')->nullable();

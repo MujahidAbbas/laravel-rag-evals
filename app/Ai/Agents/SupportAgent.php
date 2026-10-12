@@ -2,16 +2,14 @@
 
 namespace App\Ai\Agents;
 
-use App\Ai\Middleware\TraceGeneration;
 use App\Ai\Tools\SearchKnowledgeBase;
 use Laravel\Ai\Contracts\Agent;
-use Laravel\Ai\Contracts\HasMiddleware;
 use Laravel\Ai\Contracts\HasTools;
 use Laravel\Ai\Contracts\Tool;
 use Laravel\Ai\Promptable;
 use Stringable;
 
-class SupportAgent implements Agent, HasMiddleware, HasTools
+class SupportAgent implements Agent, HasTools
 {
     use Promptable;
 
@@ -32,14 +30,5 @@ class SupportAgent implements Agent, HasMiddleware, HasTools
     public function tools(): iterable
     {
         return [new SearchKnowledgeBase];
-    }
-
-    /**
-     * Wrap every run so retrieval, the answer, and its token cost land on one
-     * rag_traces row.
-     */
-    public function middleware(): array
-    {
-        return [app(TraceGeneration::class)];
     }
 }

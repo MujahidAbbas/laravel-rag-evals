@@ -80,7 +80,8 @@ php artisan migrate:fresh --force && php artisan kb:ingest
 The evals above run offline, against a golden set. Production has no labels.
 `TracedRetriever` records one `rag_traces` row per query: the retrieved chunks with
 their similarity scores and ranks, per-stage latency, and — via the `TraceGeneration`
-agent middleware — the answer, its token cost, and a sampled faithfulness score.
+listener on the AI SDK's agent events — the answer, its token cost, and a sampled
+faithfulness score.
 
 ```bash
 php artisan migrate                              # creates rag_traces

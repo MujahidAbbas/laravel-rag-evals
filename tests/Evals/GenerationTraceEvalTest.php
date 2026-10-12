@@ -3,6 +3,8 @@
 use App\Ai\Agents\SupportAgent;
 use App\Jobs\EvaluateRagTrace;
 use App\Models\RagTrace;
+use Illuminate\Support\Facades\Event;
+use Laravel\Ai\Events\AgentPrompted;
 
 /**
  * Generation-trace eval: runs the full agent on each question and checks that
@@ -11,8 +13,8 @@ use App\Models\RagTrace;
  * was actually given.
  *
  * The retrieval trace is written inside the SearchKnowledgeBase tool; the
- * TraceGeneration middleware fills in the answer, tokens, and cost on the same
- * row once the model replies. Then EvaluateRagTrace scores faithfulness. In
+ * TraceGeneration listener fills in the answer, tokens, and cost on the same
+ * row once the run's AgentPrompted event fires. Then EvaluateRagTrace scores faithfulness. In
  * production the judge runs on a sampled fraction from a queue; here we run it
  * on every trace, synchronously, to get a number.
  *
@@ -29,6 +31,14 @@ it('captures answer, token cost, and faithfulness on every trace', function () {
     );
 
     RagTrace::truncate();
+
+    // Note which model actually answered, from the response meta.
+    $models = [];
+    Event::listen(AgentPrompted::class, function (AgentPrompted $event) use (&$models) {
+        if ($event->prompt->agent instanceof SupportAgent) {
+            $models[] = $event->response->meta->model;
+        }
+    });
 
     foreach ($golden as $case) {
         (new SupportAgent)->prompt($case['question']);
@@ -58,7 +68,7 @@ it('captures answer, token cost, and faithfulness on every trace', function () {
         "  mean cost/query:    \$%s  (at the config rate — swap your own)\n".
         "  faithfulness:       %d/%d scored >= 7/10 (mean score %.1f)\n",
         $traces->count(),
-        'gpt-5.4 (from response meta)',
+        implode(', ', array_unique($models)),
         $mean('input_tokens'),
         $mean('output_tokens'),
         number_format((float) $mean('cost_usd'), 6),

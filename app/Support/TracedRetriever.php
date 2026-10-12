@@ -71,8 +71,8 @@ class TracedRetriever
             'search_ms' => round($searchMs, 2),
         ]);
 
-        // Hand the row id to the generation middleware wrapping this request, so
-        // the answer and its token cost land on the same trace as the retrieval.
+        // Hand the row id to the generation listener that fires after this run,
+        // so the answer and its token cost land on the same trace as the retrieval.
         $this->context->set($trace->id);
     }
 }

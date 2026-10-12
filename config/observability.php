@@ -14,8 +14,11 @@ return [
     | from tokens and your own rate card. Swap these for your provider's real
     | numbers; the token counts are measured, the dollars are only as right as
     | the rate you put here.
+    |
+    | On laravel/ai 1.x the input count includes cache reads and cache writes,
+    | which providers bill at their own rates, so each gets its own rate.
     */
     'pricing' => [
-        'default' => ['input' => 1.25, 'output' => 10.00],
+        'default' => ['input' => 1.25, 'cache_read' => 0.125, 'cache_write' => 1.25, 'output' => 10.00],
     ],
 ];
